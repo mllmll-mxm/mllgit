@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:include="include/header::html">
+
+</head>
+<body>
+<script type="text/javascript">
+
+
+    $(function(){
+        var data4vue={
+            uri:'add',
+            user:{username:'',userpwd:'',email:'',phone:''},
+            repeatpwd: '',
+            emailRegex : /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/,
+            phoneRegex : /^1[34578]\d{9}$/,
+            pwdRegex : /(?=.*[0-9])(?=.*[a-zA-Z]).{8,30}/,
+            nameFlag:false,
+            pwdFlag:false,
+            repeatFlag:false
+        };
+        var vue = new Vue({
+            el:'#workingArea',
+            data:data4vue,
+            mounted:function(){
+                console.log("准备好了");
+            },
+            methods:{
+                hrefto:function(){
+                    this.$router.push('home');
+                },
+                checkValidName:function(text){
+                    if (!(this.user.username.length!=0&&(this.emailRegex.test(this.user.username)||this.phoneRegex.test(this.user.username)))){
+                        $("#errorDiv").css("visibility","visible");
+                        $(".errorMessage").html("请输入手机号或者邮箱");
+                    }else{
+                        $("#errorDiv").css("visibility","hidden");
+                        this.nameFlag = true;
+                    }
+                },
+                checkValid:function(text){
+                    if (text==this.user.userpwd){
+                        if (!this.pwdRegex.test(this.user.userpwd)){
+                            $("#errorDiv").css("visibility","visible");
+                            $(".errorMessage").html("密码必须包括字母，数字，至少8个字符");
+                        }else
+                            $("#errorDiv").css("visibility","hidden");
+                        this.pwdFlag = true;
+                    }
+                    if (text==this.repeatpwd){
+                        if (text.length==0){
+                            $("#errorDiv").css("visibility","visible");
+                            $(".errorMessage").html("请再次确认密码");
+                        }else{
+                            if (text!=this.user.userpwd){
+                                $("#errorDiv").css("visibility","visible");
+                                $(".errorMessage").html("两次密码不一致");
+                            }else{
+                                $("#errorDiv").css("visibility","hidden");
+                                this.repeatFlag = true;
+                            }
+
+
+                        }
+                    }
+                },
+                register:function(){
+                    if (this.nameFlag&&this.pwdFlag&&this.repeatFlag==false){
+                        return;
+                    }
+                    var url = this.uri;
+                    if (this.emailRegex.test(this.user.username)){
+                        this.user.email = this.user.username;
+                    }
+                    if (this.phoneRegex.test(this.user.username)){
+                        this.user.phone = this.user.username;
+                    }
+                    axios.post(url,this.user).then(function(response){
+                        var result = response.data;
+                        if (result.code=="success"){
+                            console.log("注册成功");
+                            location.href="home";
+                        }else
+                            $(".errorMessage").html(result.data);
+                        $("#errorDiv").css("visibility","visible");
+                    });
+                }
+            }
+        });
+    })
+
+
+</script>
+    <div id="workingArea">
+
+        <div id="registerDiv">
+            <h1 style="text-align: center">用户注册</h1>
+            <div id="errorDiv">
+                <div role="alert" class="alert alert-danger">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"></button>
+                    <span class="errorMessage"></span>
+                </div>
+            </div>
+            <table class="registerTable" align="center">
+                <tr>
+                    <td class="rename">用户名</td>
+                    <td class="renameInput"><input v-model="user.username" @blur="checkValidName(user.username)" placeholder="请输入手机号或者邮箱"/></td>
+                </tr>
+                <tr>
+                    <td class="repwd">密码</td>
+                    <td class="repwdInput"><input v-model="user.userpwd" @blur="checkValid(user.userpwd)"  type="password" placeholder="请输入密码"/></td>
+                </tr>
+                <tr>
+                    <td class="confirmPwd">确认密码</td>
+                    <td class="confirmPwdInput"><input v-model="repeatpwd" @blur="checkValid(repeatpwd)"  type="password" placeholder="请再次确认密码"/></td>
+                </tr>
+                <tr>
+                    <td colspan="2" align="center">
+                        <a @click="register" ><button id="sub">注册</button></a>
+                    </td>
+                </tr>
+            </table>
+
+        </div>
+    </div>
+
+</body>
+</html>

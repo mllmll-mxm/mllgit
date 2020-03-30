@@ -1,0 +1,87 @@
+<div th:fragement="html">
+
+    <script>
+        $(function(){
+            var data4vue={
+                uri:'add',
+                user:{username:'',userpwd:''},
+                repeatpwd: ''
+            };
+            var vue = new Vue({
+                el:'#workingArea',
+                data:data4vue,
+
+                methods:{
+                    register:function(){
+                        var url = this.uri;
+                        if (0==this.user.username.length){
+                            $("span.errorMessage").html("请输入用户名");
+                            $("div.errorDiv").css("visibility","visible");
+                            return;
+                        }
+                        if (0==this.user.userpwd.length){
+                            $("span.errorMessage").html("请输入密码");
+                            $("div.errorDiv").css("visibility","visible");
+                            return;
+                        }
+                        if (0==this.user.repeatpwd.length){
+                            $("span.errorMessage").html("请再次输入密码");
+                            $("div.errorDiv").css("visibility","visible");
+                            return;
+                        }
+                        if (this.user.userpwd!=this.repeatpwd){
+                            $("span.errorMessage").html("两次密码输入不一致");
+                            $("div.errorDiv").css("visibility","visible");
+                            return;
+                        }
+                        axios.post(url,this.user).then(function(response){
+                            var result = response.data;
+                            if (result.code==1){
+                                location.href="registerSuccess";
+                            }else
+                                $("span.errorMessage").html(result.message);
+                            $("div.errorDiv").css("visibility","visible");
+                        });
+
+                    }
+                }
+            });
+        });
+    </script>
+
+
+
+    <div id="registerDiv">
+        <div id="errorDiv">
+            <div role="alert" class="alert alert-danger">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"></button>
+                <span class="errorMessage"></span>
+            </div>
+        </div>
+        <table class="registerTable" align="center">
+            <tr>
+                <td class="rename">用户名</td>
+                <td class="renameInput"><input v-model="user.username" placeholder="请输入用户名"/></td>
+            </tr>
+            <tr>
+                <td class="repwd">密码</td>
+                <td class="repwdInput"><input v-model="user.userpwd" type="password" placeholder="请输入密码"/></td>
+            </tr>
+            <tr>
+                <td class="confirmPwd">确认密码</td>
+                <td class="confirmPwdInput"><input v-model="repeatpwd" type="password" placeholder="请再次确认密码"/></td>
+            </tr>
+<!--            <tr>-->
+<!--                <td class="reSubmitBTN" colspan="2">-->
+<!--                   <input type="button" value="注册" @click="register"/>-->
+<!--                </td>-->
+<!--            </tr>-->
+        </table>
+<!--        <form action="/add" method="post">-->
+<!--            name:<input id="name" name="username"/>-->
+<!--            pwd:<input name="userpwd" type="password"/>-->
+<!--            <input type="submit" value="提交"/>-->
+<!--        </form>-->
+    </div>
+
+</div>

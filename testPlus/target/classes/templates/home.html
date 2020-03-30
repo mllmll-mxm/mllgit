@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head th:include="include/header::html">
+</head>
+<body>
+    <script>
+        $(function(){
+            var vue = new Vue({
+                el:'#homePage',
+                mounted:function(){
+
+                },
+                methods:{
+                    logout:function(){
+                        var url = 'logout';
+                        axios.get(url).then(function(response){
+                            location.href="home";
+                        });
+                    },
+                    getHeader:function(){
+                        this.$http.get()
+                    }
+                }
+            });
+        });
+    </script>
+    <h1 style="text-align: center">首页</h1>
+    <div id="homePage">
+        <a href="/turn"><button>注册</button></a>
+        <shiro:guest><a href="/login"><button>登录</button></a></shiro:guest>
+        <shiro:user><p shiro:principal property="username"></p></shiro:user>
+        <a href="/pay"><button>购买</button></a>
+        <a href="/learn"><button>开始学习</button></a>
+        <shiro:user><button @click="logout">退出</button></shiro:user>
+    </div>
+</body>
+</html>
